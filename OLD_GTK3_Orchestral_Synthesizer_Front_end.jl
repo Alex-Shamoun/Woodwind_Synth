@@ -1,11 +1,12 @@
 using Gtk
 using GTK3_jll
 using Plots
+using Mousetrap
 
 include("Project_3_Synthesizer.Jl")
 
 
-#Grid decleration
+# Grid decleration
 g = GtkGrid() # initialize a grid to hold buttons
 set_gtk_property!(g, :row_spacing, 5) # Spacing between rows 
 set_gtk_property!(g, :row_homogeneous, true) # stretch rows with window resize
@@ -19,6 +20,7 @@ insidx=0
 xartidx=0
 duridx=0
 octidx=0
+
 
 
 
