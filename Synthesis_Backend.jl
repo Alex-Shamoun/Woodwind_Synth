@@ -1,4 +1,3 @@
-using Gtk
 using Sound
 using WAV
 using Plots
@@ -6,6 +5,41 @@ using MAT
 using MIRT
 using DSP: Windows
 using FFTW
+
+
+#struct for all the note information
+struct note_datas
+    Midi::Int64
+    Envindex::Int64
+    Dynamic::Int64
+    Vibamp::Float64
+    VibFreq::Float64
+    TremAmp::Float64
+    TremFreq::Float64
+    Duration::Int64
+end
+
+
+#declaring each unit of the struct
+Flute_note = note_datas
+Clarinet_note = note_datas
+Bassoon_note = note_datas
+Oboe_data = note_datas
+
+#declaring the vector of struct data
+Flute_Data = Vector{note_datas}
+Clarinet_Data = Vector{note_datas}
+Bassoon_Data = Vector{note_datas}
+Oboe_Data = Vector{note_datas}
+
+
+
+global Articulation_index::Int64
+global Dynamic_Index::Int64
+global Duration_Val::Int64
+
+
+
 
 # initialize two global variables used throughout
 S = 44400 # sampling rate (samples/second), 44400 was chosen to make sixteenth notes have an integer ammount of samples.

@@ -3,7 +3,7 @@ using GTK3_jll
 using Plots
 using Mousetrap
 
-include("Project_3_Synthesizer.Jl")
+include("Synthesis_Backend.jl")
 
 
 # Grid decleration
