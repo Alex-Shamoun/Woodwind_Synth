@@ -1,6 +1,5 @@
 using Sound
 using WAV
-using Plots
 using MAT
 using MIRT
 using DSP: Windows
@@ -34,7 +33,7 @@ Oboe_Data = Vector{note_datas}
 
 
 
-global Articulation_index::Int64
+global Articulation_Index::Int64
 global Dynamic_Index::Int64
 global Duration_Val::Int64
 
@@ -54,7 +53,7 @@ NomETime = [0,0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1] #normal Envelope
 NomEValue = [0,0.6,  0.9, 0.8,0.7, 0.4, 0.2, 0]
 
 
-StacETime = [0,0.03, 0.08, 0.11,0.14, 0.22, 0.25, 0.28, 0.35] #Staccato Envelope
+StacETime = [0,0.03, 0.08, 0.11,0.14, 0.22, 0.25, 0.28, 0.4] #Staccato Envelope
 StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
 
 
@@ -69,10 +68,8 @@ Clarf= [1, 2, 3, 4, 5, 6, 7]
 
 
 octave = 4
-BPM=120
-BPS=BPM/60
-QuarterSamples=S/BPS
-Notetype= 2
+#BPM=120
+#BPS=BPM/60
 
 function NoiseY(noise::Vector, lo::Int64, hi::Int64)
     N = length(noise)
@@ -97,6 +94,8 @@ function miditone(midi::Int64, Instrument::Int64, Envindex::Int64, Vibamt::Float
     #calls the audio function depending on what instrument we are playing
     return nothing
 end
+
+
 
 
 
