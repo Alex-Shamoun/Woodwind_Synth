@@ -180,47 +180,40 @@ main() do app::Application
     Dynamic_Index = 1
     #declaring the Functions that get called when you press a button
 
-    
-    function printew(self::Button, data)
-        println(data)
-    end
 
-    function Note_Val(self::Button, data)
-        println(data[2])
-        Duration_Val= data[2]
+    function Note_Val(self::Button, data) #Call for the note values
+        Duration_Val= data[2] #assigns the duration value
         for i in 1:size(Note_Durations, 1)
             name = Note_Durations[i, 1]
-            remove_css_class!(Note_vals[name], "pressed")
+            remove_css_class!(Note_vals[name], "pressed") #unpresses all the other buttons
             add_css_class!(Note_vals[name], "white")
         end
         remove_css_class!(Note_vals[data[1]], "white")
-        add_css_class!(Note_vals[data[1]], "pressed")
+        add_css_class!(Note_vals[data[1]], "pressed") #presses (signifies) the button you pressed
     end
 
 
     function Dynamic_Call(self::Button, data)
-        println(data[2])
-        Dynamic_Index = data[2]
-        for i in 1:size(Dynamics, 1)
+        Dynamic_Index = data[2]#assigns the Dynamic value
+        for i in 1:size(Dynamics, 1) 
             name = Dynamics[i, 1]
-            remove_css_class!(Dynamic_Dict[name], "pressed")
+            remove_css_class!(Dynamic_Dict[name], "pressed") #unpresses all the other buttons
             add_css_class!(Dynamic_Dict[name], "white")
         end
         remove_css_class!(Dynamic_Dict[data[1]], "white")
-        add_css_class!(Dynamic_Dict[data[1]], "pressed")
+        add_css_class!(Dynamic_Dict[data[1]], "pressed")#presses (signifies) the button you pressed
     end
 
 
     function Articulation_Call(self::Button, data)
-        println(data[2])
-        Articulation_Index = data[2]
+        Articulation_Index = data[2] #assigns the Articulation index
         for i in 1:size(Articulations, 1)
             name = Articulations[i, 1]
-            remove_css_class!(Articulation_Dict[name], "pressed")
+            remove_css_class!(Articulation_Dict[name], "pressed") #unpresses all the other buttons
             add_css_class!(Articulation_Dict[name], "white")
         end
         remove_css_class!(Articulation_Dict[data[1]], "white")
-        add_css_class!(Articulation_Dict[data[1]], "pressed")
+        add_css_class!(Articulation_Dict[data[1]], "pressed")#presses (signifies) the button you pressed
     end
 
 
@@ -241,11 +234,47 @@ main() do app::Application
         end
 
         #Sets up the Struct with all the information
-        Note_Info = note_datas(data +12*Octave , Articulation_Index, Dynamic_Index, get_value(Slider_vals["Vibrato Amplitude"]), get_value(Slider_vals["Vibrato Frequency (Hz)"]), get_value(Slider_vals["Tremolo Amplitude"]),get_value(Slider_vals["Tremolo Frequency (Hz)"]),Duration_Val)
+        Vib_Amp= get_value(Slider_vals["Vibrato Amplitude"])
+        Vib_Freq=get_value(Slider_vals["Vibrato Frequency (Hz)"])
+        Trem_Amp=get_value(Slider_vals["Tremolo Amplitude"])
+        Trem_Freq=get_value(Slider_vals["Tremolo Frequency (Hz)"])
+        Note_Info = note_datas(data +12*Octave , Articulation_Index, Dynamic_Index,Vib_Amp , Vib_Freq, Trem_Amp,Trem_Freq,Duration_Val)
+        #Makes sure that you have the right instrument selected
 
-        println(data)
-        println("RAWR")
+        instid= get_selected(InstrumentChoice)
+        instrument=1
+        if instid == Bassoon_ID
+            instrument=4
+        elseif instid == Oboe_ID
+            instrument= 3
+        elseif instid == Clarinet_ID
+            instrument=2
+        elseif instid == Flute_ID
+            instrument=1
+        end
+        #calls the synthesis function in the backend
 
+        Instrumental_Note_Call(instrument, Note_Info, Int(get_value(BPMButton)))
+
+        return nothing
+
+    end
+
+
+    #Function call for the keyboard input to the keyboard
+    function Key_Pressed(data)
+        Octave= get_value(OctaveButton)
+
+        if get_selected(InstrumentChoice) == Bassoon_ID # Adjusts the octave for the Bassoon
+            Octave-=2
+        end
+
+        #Sets up the Struct with all the information
+        Vib_Amp= get_value(Slider_vals["Vibrato Amplitude"])
+        Vib_Freq=get_value(Slider_vals["Vibrato Frequency (Hz)"])
+        Trem_Amp=get_value(Slider_vals["Tremolo Amplitude"])
+        Trem_Freq=get_value(Slider_vals["Tremolo Frequency (Hz)"])
+        Note_Info = note_datas(data +12*Octave , Articulation_Index, Dynamic_Index,Vib_Amp , Vib_Freq, Trem_Amp,Trem_Freq,Duration_Val)
         #Makes sure that you have the right instrument selected
 
         instid= get_selected(InstrumentChoice)
@@ -260,6 +289,7 @@ main() do app::Application
             instrument=1
         end
 
+        #calls the synthesis function in the backend
         Instrumental_Note_Call(instrument, Note_Info, Int(get_value(BPMButton)))
 
         return nothing
@@ -267,26 +297,43 @@ main() do app::Application
     end
 
 
+    #The function that gets called when you press Play
     function Play_Pressed(self::Button)
-        FMix = get_value(Mixer_Vals["Flute"])
+        FMix = get_value(Mixer_Vals["Flute"]) #Adjusts the Mixer
         CMix = get_value(Mixer_Vals["Clarinet"])
         OMix = get_value(Mixer_Vals["Oboe"])
         BMix = get_value(Mixer_Vals["Bassoon"])
 
 
 
-        Mixer = [FMix, CMix,OMix, BMix]
-        Play_button_clicked(Int(get_value(BPMButton)), Mixer)
+        Mixer = [FMix, CMix,OMix, BMix]#Creates Mixer Vector to get passed through
+        Play_button_clicked(Int(get_value(BPMButton)), Mixer, true) #Calls the Playback function
         return nothing
     end
 
     function Play_current(self::Button)
-
+        instrument=1
+        instid= get_selected(InstrumentChoice) #Figures out which instrument to delete the note from
+        if instid == Bassoon_ID
+            instrument=4
+            Mix = get_value(Mixer_Vals["Bassoon"])
+        elseif instid == Oboe_ID
+            instrument= 3
+            Mix = get_value(Mixer_Vals["Oboe"])
+        elseif instid == Clarinet_ID
+            instrument=2
+            Mix = get_value(Mixer_Vals["Clarinet"])
+        elseif instid == Flute_ID
+            instrument=1
+            Mix = get_value(Mixer_Vals["Flute"]) #Adjusts the Mixer
+        end
+        Play_Part(Int(get_value(BPMButton)), instrument, Mix, true)
     end
 
-    function Delete_Note(self::Button)
+
+    function Delete_Note(self::Button) #Will delete the last played note
         instrument=1
-        instid= get_selected(InstrumentChoice)
+        instid= get_selected(InstrumentChoice) #Figures out which instrument to delete the note from
         if instid == Bassoon_ID
             instrument=4
         elseif instid == Oboe_ID
@@ -296,13 +343,13 @@ main() do app::Application
         elseif instid == Flute_ID
             instrument=1
         end
-        delete_clicked(instrument)
+        delete_clicked(instrument)# Calls the delete function in the backend
         return nothing
     end
 
     function Clear_Part(self::Button)
         instrument=1
-        instid= get_selected(InstrumentChoice)
+        instid= get_selected(InstrumentChoice) #Figures out which part to delete
         if instid == Bassoon_ID
             instrument=4
         elseif instid == Oboe_ID
@@ -312,17 +359,41 @@ main() do app::Application
         elseif instid == Flute_ID
             instrument=1
         end
-        clear_clicked(instrument)
+        clear_clicked(instrument) #Calls the clear clicked function
         return nothing
 
     end
 
     function Export_Part(self::Button)
-
+        instrument=1
+        instid= get_selected(InstrumentChoice) #Figures out which instrument to delete the note from
+        if instid == Bassoon_ID
+            instrument=4
+            Mix = get_value(Mixer_Vals["Bassoon"])
+        elseif instid == Oboe_ID
+            instrument= 3
+            Mix = get_value(Mixer_Vals["Oboe"])
+        elseif instid == Clarinet_ID
+            instrument=2
+            Mix = get_value(Mixer_Vals["Clarinet"])
+        elseif instid == Flute_ID
+            instrument=1
+            Mix = get_value(Mixer_Vals["Flute"]) #Adjusts the Mixer
+        end
+        Play_Part(Int(get_value(BPMButton)), instrument, Mix, false)
     end
 
     function Export_no_Playback(self::Button)
+        FMix = get_value(Mixer_Vals["Flute"]) #Adjusts the Mixer
+        CMix = get_value(Mixer_Vals["Clarinet"])
+        OMix = get_value(Mixer_Vals["Oboe"])
+        BMix = get_value(Mixer_Vals["Bassoon"])
 
+
+
+        Mixer = [FMix, CMix,OMix, BMix]#Creates Mixer Vector to get passed through
+        Play_button_clicked(Int(get_value(BPMButton)), Mixer, false) #Calls the Playback function
+        return nothing
     end
 
     
@@ -402,9 +473,9 @@ main() do app::Application
         connect_signal_clicked!(Play_Pressed, PlayButton)
         insert_at!(grid, PlayButton, 1, 7, 2, 1)
     #Play Button 
-        Play_PartButton = Button(Label("Play"))
+        Play_PartButton = Button(Label("Play Part"))
         add_css_class!(Play_PartButton, "play_part")
-        #connect_signal_clicked!(Play_current, Play_PartButton)
+        connect_signal_clicked!(Play_current, Play_PartButton)
         insert_at!(grid, Play_PartButton, 3, 7, 2, 1)
 
     #Delte Button
@@ -421,19 +492,19 @@ main() do app::Application
     #Export Part Button
        Export_PartButton = Button(Label("Export Part"))
        add_css_class!(Export_PartButton, "export")
-       #connect_signal_clicked!(Export_Part, Export_PartButton)
-       insert_at!(grid, Export_PartButton, 1, 9, 2, 2)     
+       connect_signal_clicked!(Export_Part, Export_PartButton)
+       insert_at!(grid, Export_PartButton, 3, 9, 2, 2)     
 
     #Export Song Button
-    Export_No_PlayButton = Button()
-    exp_label=Label("Export Without Playback")
-    set_justify_mode!(exp_label, JUSTIFY_MODE_CENTER)
-    set_wrap_mode!(exp_label,LABEL_WRAP_MODE_WORD_OR_CHAR)
-    set_child!(Export_No_PlayButton, exp_label)
+        Export_No_PlayButton = Button()
+        exp_label=Label("Export Without Playback")
+        set_justify_mode!(exp_label, JUSTIFY_MODE_CENTER)
+        set_wrap_mode!(exp_label,LABEL_WRAP_MODE_WORD_OR_CHAR)
+        set_child!(Export_No_PlayButton, exp_label)
 
-    add_css_class!(Export_No_PlayButton, "export")
-    #connect_signal_clicked!(Export_no_Playback, Export_No_PlayButton)
-    insert_at!(grid, Export_No_PlayButton, 3, 9, 2, 2)  
+        add_css_class!(Export_No_PlayButton, "export")
+        connect_signal_clicked!(Export_no_Playback, Export_No_PlayButton)
+        insert_at!(grid, Export_No_PlayButton, 1, 9, 2, 2)  
 
 
 
@@ -501,40 +572,40 @@ main() do app::Application
     function on_key_pressed(self::KeyEventController, code::KeyCode, modifier_state::ModifierState) ::Nothing 
         #Start of Keyboard to keybaord shortcuts
         if code==KEY_z 
-            printew(65)
+            Key_Pressed(65)
         end
         if code==KEY_s 
-            printew(66)
+            Key_Pressed(66)
         end        
         if code==KEY_x 
-            printew(67)
+            Key_Pressed(67)
         end
         if code==KEY_d 
-            printew(68)
+            Key_Pressed(68)
         end        
         if code==KEY_c 
-            printew(69)
+            Key_Pressed(69)
         end
         if code==KEY_f 
-            printew(70)
+            Key_Pressed(70)
         end           
         if code==KEY_v 
-            printew(71)
+            Key_Pressed(71)
         end
         if code==KEY_b 
-            printew(72)
+            Key_Pressed(72)
         end 
         if code==KEY_h 
-            printew(73)
+            Key_Pressed(73)
         end        
         if code==KEY_n 
-            printew(74)
+            Key_Pressed(74)
         end 
         if code==KEY_j 
-            printew(75)
+            Key_Pressed(75)
         end 
         if code==KEY_m 
-            printew(76)
+            Key_Pressed(76)
         end
 
         # End of Keyboard to keyboard shortcuts
@@ -544,6 +615,14 @@ main() do app::Application
     end
 
     add_css_class!(window, "window")
+
+
+    remove_css_class!(Note_vals["Quarter"], "white")
+    add_css_class!(Note_vals["Quarter"], "pressed")
+    remove_css_class!(Articulation_Dict["Normal"], "white")
+    add_css_class!(Articulation_Dict["Normal"], "pressed")
+    remove_css_class!(Dynamic_Dict["Forte"], "white")
+    add_css_class!(Dynamic_Dict["Forte"], "pressed")
 
 
     key_controller = KeyEventController()

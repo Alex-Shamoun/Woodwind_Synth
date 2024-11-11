@@ -46,12 +46,8 @@ S = 44100 # sampling rate (samples/second), 44400 was chosen to make sixteenth n
 song = Float32[] # initialize "song" as an empty vector
 Fsong = Float32[]
 Csong = Float32[]
-FNotetype= Float32[]
-CNotetype= Float32[]
 Osong = Float32[]
 Bsong = Float32[]
-ONotetype= Float32[]
-BNotetype= Float32[]
 
 #declaring the Envelope relations
 NomETime = [0,0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1] #normal Envelope
@@ -125,8 +121,6 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         Vectsize+=N
     end
     Song_Vector= Array{Float32, 1}(undef, Vectsize)
-    println(length(Song_Vector))
-    println(Vectsize)
 
     #converts note type into the relative notetype for usage
     Indexval= 1
@@ -203,32 +197,26 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
     if Playback== true
         if c==Flutec #Appends to the indiviual song vectors
             global Fsong= Song_Vector #Saves note to Flute
-           
         elseif c==Clarc
             global Csong= Song_Vector#Saves note to Clarinet
            
         elseif c==Oboec
-            global Osong= Song_Vector #Saves note to Clarinet
+            global Osong= Song_Vector #Saves note to Oboe
           
         elseif c==Bassoonc
-            global Bsong= Song_Vector #Saves note to Clarinet
+            global Bsong= Song_Vector #Saves note to Bassoon
            
         end
-    end
-    if Playback== false
+    elseif Playback== false
         soundsc(Music, S)# play note so that user can hear it immediately
         if c==Flutec #Appends to the indiviual song vectors
             push!(Flute_Data, Note[1])
-            global FNotetype= [FNotetype; Notetype] #saves note type
         elseif c==Clarc
             push!(Clarinet_Data, Note[1])
-            global CNotetype= [CNotetype; Notetype] #saves note type
         elseif c==Oboec
             push!(Oboe_Data, Note[1])
-            global ONotetype= [ONotetype; Notetype] #saves note type
         elseif c==Bassoonc
             push!(Bassoon_Data, Note[1])
-            global BNotetype= [BNotetype; Notetype] #saves note type
         end
     end
 
@@ -302,7 +290,7 @@ function clear_clicked(Insturment::Int64)
 end
 
 
-function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}) # callback function for "end" button
+function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}, Playback::Bool) # callback function for "end" button
     println("The play button")
     global Fsong
     global Csong
@@ -310,7 +298,7 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}) # callback func
     global Bsong
 
     #Running the funcitons to generate the indiviual instrument vectors
-    Audio(Flute_Data, Flutec, BPM, true)
+    Audio(Flute_Data, Flutec, BPM, true) 
     Audio(Clarinet_Data, Clarc, BPM, true)
     Audio(Oboe_Data, Oboec, BPM, true)
     Audio(Bassoon_Data, Bassoonc, BPM, true)
@@ -337,9 +325,9 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}) # callback func
     end
 
     if long !=2 #making song vectors equal length
-        addzero1=size - Csize
+        addzero1=size - Csize #sees how many zeros to add
         addedzeros1=zeros(addzero1, 1)
-        FinCsong=[FinCsong; addedzeros1]
+        FinCsong=[FinCsong; addedzeros1] #adds the zeros
     end
     if long != 1
         addzero2=size-Fsize
@@ -361,13 +349,47 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}) # callback func
     song = (Mixer[1] .* FinFsong) .+ (Mixer[2] .* FinCsong) .+( Mixer[3] .*FinOsong ).+ (Mixer[4] .* FinBsong )#adding song vectors together
 
     println(length(Fsong))
-    soundsc(song, S) # play the entire song when user clicks "end"
+    if Playback== true #Checks that we are actually playing the song and not just exporting
+        soundsc(song, S) # play the entire song when user clicks "end"
+    end
     Song=song./50 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
-    wavwrite(Song,"Song.WAV"; Fs=44100) # save song to file
+    wavwrite(Song,"Exported_Audio/Song.WAV"; Fs=44100) # save song to file
 
 end
 
 
+function Play_Part(BPM::Int64, instrument::Int64, Mix::Float32, Playback::Bool) # callback function for "end" button
+    println("The play button")
+    global songl
+    inst = ""
+    #Running the funcitons to generate the indiviual instrument vectors
+    if instrument== 1
+        Audio(Flute_Data, Flutec, BPM, true)
+        songl=Fsong
+        inst= "Flute"
+    elseif instrument == 2
+        Audio(Clarinet_Data, Clarc, BPM, true)
+        songl=Csong
+        inst= "Clarinet"
+    elseif instrument == 3
+        Audio(Oboe_Data, Oboec, BPM, true)
+        songl=Osong
+        inst= "Oboe"
+    elseif instrument == 4
+        Audio(Bassoon_Data, Bassoonc, BPM, true)
+        songl=Bsong
+        inst= "Bassoon"
+    end
+    
+
+    song = Mix .* songl # creates the audio vector
+    if Playback== true #checks that we are not just exporting
+        soundsc(song, S) # play the entire song when user clicks "end"
+    end
+    Song=song./50 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
+    wavwrite(Song,"Exported_Audio/$(inst)_Part.WAV"; Fs=44100) # save song to file
+
+end
 
 
 
