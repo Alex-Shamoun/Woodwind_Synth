@@ -153,7 +153,7 @@ main() do app::Application
     black = ["F#" 2 66; "G#" 4 68; "A#" 6 70; "C#" 10 73; "D#" 12 75] #array containing each sharp's name and its column position
     Note_Durations = ["Whole" 2 4; "Half" 4 2; "Quarter" 6 1; "Eigth" 8 1/2; "Sixteenth" 10 1/4] #array containing each note duration and position
     Sliders = ["Tremolo Amplitude" 6 4 6; "Tremolo Frequency (Hz)" 6 6 6; "Vibrato Amplitude" 13 4 6; "Vibrato Frequency (Hz)" 13 6 6] #array containing each slider and their position (for vibrato and tremolo)
-    Dynamics =["Forte" 6 1; "Mezzo Forte" 8 2; "Mezzo Piano" 10 3; "Piano" 12 4] #array containing the dynamics and posiition
+    Dynamics =["Forte" 6 1; "Mezzo Forte" 8 0.7; "Mezzo Piano" 10 0.5; "Piano" 12 0.3] #array containing the dynamics and posiition
     Articulations= ["Staccato" 17 1 1; "Normal" 19 1 2; "Tenuto" 17 2 3; "Marcato" 19 2 4 ]
     Mixer = ["Flute" 5 1 ; "Clarinet" 5 2 ; "Oboe" 5 3 ; "Bassoon" 5 4 ]
 
@@ -268,7 +268,15 @@ main() do app::Application
 
 
     function Play_Pressed(self::Button)
-        Play_button_clicked(Int(get_value(BPMButton)))
+        FMix = get_value(Mixer_Vals["Flute"])
+        CMix = get_value(Mixer_Vals["Clarinet"])
+        OMix = get_value(Mixer_Vals["Oboe"])
+        BMix = get_value(Mixer_Vals["Bassoon"])
+
+
+
+        Mixer = [FMix, CMix,OMix, BMix]
+        Play_button_clicked(Int(get_value(BPMButton)), Mixer)
         return nothing
     end
 

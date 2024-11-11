@@ -17,6 +17,9 @@ using DSP
 
 
 
+
+
+
 #creating model of flute
 S = 44100
 N = Int(1 * S) # 0.5 sec
@@ -64,7 +67,7 @@ env = interp1(adsr_time, adsr_vals, t) # !!
 y = env .* x
 #soundsc(y, S)
 
-plot(y)
+#plot(y)
 xlims!(1, 200)
 
 
@@ -118,8 +121,8 @@ Cnoise= 2*real(ifft(fz)) # convert back to time domain
 x = z * c.+ CNoise
 
 Clar = env .* x 
-soundsc(Clar, S)
-plot(Clar)
+#soundsc(Clar, S)
+#plot(Clar)
 #xlims!(0,500)
 
 
@@ -152,15 +155,53 @@ y = +([c[k] * sin.(2π * f[k] * t + f[k] * lfo) for k in 1:length(c)]...)
 
 x = y.+Noise # applying the noise to the wave, and the amplitudes
 z = env .* x
-soundsc(z, S)
+#soundsc(z, S)
 
 
 
 Tremlfo = 0.7 .- 0.2 * cos.(2π*6*t) # what frequency?
 y = Tremlfo .* z
-soundsc(y, S)
-plot(x)
+#soundsc(y, S)
+#plot(x)
 
 
 
 #clarinet Tremo + Vibrato
+
+
+
+#Oboe Testing Audio
+
+
+S = 44100
+N = Int(1 * S) # 0.5 sec
+t = (0:N-1)/S # time samples: t = n/S
+c = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*100 # amplitudes #oboe ratio 1 (A4)
+c = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006]*100 # amplitudes #oboe ratio 2 (A5)
+
+
+f= [1, 2, 3, 4, 5, 6, 7] *(440*2)
+z = sin.(2π * t * f'*2^(0/12))
+
+
+
+ONoise=0.005*randn(size(t))*100
+#Clarinet Noise
+lo=50
+hi=600
+N = length(ONoise)
+cutoff_hz = [lo, hi] # frequency range to retain (pass)
+cutoff_index = round.(Int, cutoff_hz/S*N) # k = (f/S)*N
+fx = fft(ONoise) # spectrum
+fz = zeros(eltype(fx), size(fx))
+pass = (1+cutoff_index[1]):min(1+cutoff_index[2], N)
+fz[pass] .= fx[pass] # pass band
+Onoise= 2*real(ifft(fz)) # convert back to time domain
+
+
+
+x = z * c.+ ONoise
+
+Oboe = env .* x 
+soundsc(Oboe, S)
+#plot(Oboe)

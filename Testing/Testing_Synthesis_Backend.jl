@@ -11,7 +11,7 @@ using Mousetrap
 struct note_datas
     Midi::Int64
     Envindex::Int64
-    Dynamic::Int64
+    Dynamic::Float64
     Vibamp::Float64
     VibFreq::Float64
     TremAmp::Float64
@@ -64,16 +64,16 @@ StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
 
 #Declaring Flute values
 
-Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes
+Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes ratio for Flute (A4)
 
 #clarinet values
-Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*120 # amplitudes
+Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*120 # amplitudes ratio for Clarinet (A4)
 
 #Oboe values
-Oboec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes
+Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*100 #amplitudes ratio for Oboe (A4)
 
 #Bassoon values
-Bassoonc = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes]
+Bassoonc = [0.19, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes] (A2)
 
 
 octave = 4
@@ -183,7 +183,8 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         Tremlfo = (1-Note[i].TremAmp*0.1).- Note[i].TremAmp*0.1 * cos.(2π*Note[i].TremFreq*t) # what frequency?
         global Music = Tremlfo .* Z #applies Tremolo to note
 
-       
+        Music *= Note[i].Dynamic
+
         if Note[i].Midi == -70
             Music *=0
         end
@@ -287,38 +288,67 @@ function clear_clicked(Insturment::Int64)
 end
 
 
-function Play_button_clicked(BPM) # callback function for "end" button
+function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}) # callback function for "end" button
     println("The play button")
     global Fsong
     global Csong
-    
+    global Osong
+    global Bsong
+
     #Running the funcitons to generate the indiviual instrument vectors
     Audio(Flute_Data, Flutec, BPM, true)
     Audio(Clarinet_Data, Clarc, BPM, true)
-
-
+    Audio(Oboe_Data, Oboec, BPM, true)
+    Audio(Bassoon_Data, Bassoonc, BPM, true)
     global FinFsong= Fsong #ddeclaring final song vectors
     global FinCsong= Csong
+    global FinOsong= Osong #ddeclaring final song vectors
+    global FinBsong= Bsong
 
-    println(length(FinFsong))
+    
 
-    Fsize=length(Fsong) #getting length of Song vectors
-    Csize=length(Csong)
-    #I=Fsize
-    # if I<Csize #making song vectors equal length
-    #     I=Csize
-    #     addzero=Csize-Fsize
-    #     addedzeros=zeros(addzero, 1)
-    #     FinFsong=[FinFsong; addedzeros]
-    # elseif I> Csize
-    #     addzero=Fsize-Csize
-    #     addedzeros=zeros(addzero, 1)
-    #     FinCsong=[FinCsong; addedzeros]
-    # elseif I==Csize
-    #end
-    song= FinFsong#adding song vectors together
+    Fsize=length(FinFsong) #getting length of Song vectors
+    Csize=length(FinCsong)
+    Osize= length(FinOsong)
+    Bsize = length(FinBsong)
+
+    length_song =[Fsize, Csize, Osize, Bsize ]
+    long= 1
+    size =length_song[1]
+    for i in 1:length(length_song)
+        if size < length_song[i]
+            size = length_song[i]
+            long=i
+        end
+    end
+
+    if long !=2 #making song vectors equal length
+        addzero1=size - Csize
+        addedzeros1=zeros(addzero1, 1)
+        FinCsong=[FinCsong; addedzeros1]
+    end
+    if long != 1
+        addzero2=size-Fsize
+        addedzeros2=zeros(addzero2, 1)
+        FinFsong=[FinFsong; addedzeros2]
+    end
+    if long != 3
+        addzero3=size-Osize
+        addedzeros3=zeros(addzero3, 1)
+        FinOsong=[FinOsong; addedzeros3]
+    end
+    if long != 4
+        addzero4=size-Bsize
+        addedzeros4=zeros(addzero4, 1)
+        FinBsong=[FinBsong; addedzeros4]
+    end
+    
+    song = Float32[]
+    song = (Mixer[1] .* FinFsong) .+ (Mixer[2] .* FinCsong) .+( Mixer[3] .*FinOsong ).+ (Mixer[4] .* FinBsong )#adding song vectors together
+
+    println(length(Fsong))
     soundsc(song, S) # play the entire song when user clicks "end"
-    Song=song./80 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
+    Song=song./50 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
     wavwrite(Song,"Song.WAV"; Fs=44100) # save song to file
 
 end
