@@ -102,8 +102,10 @@ function Instrumental_Note_Call(Instrument::Int64, Note_Info::note_datas, BPM::I
         x=Audio(Vect, Flutec, BPM, false)
     elseif Instrument==2
         x=Audio(Vect, Clarc, BPM, false)
-    else
-        println("Invalid Instrument Selected")
+    elseif Instrument ==3
+        x=Audio(Vect, Oboec, BPM, false)
+    elseif Instrument ==4
+        x=Audio(Vect, Bassoonc, BPM, false)
     end
     #calls the audio function depending on what instrument we are playing
     return nothing
@@ -149,10 +151,13 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         #Generating Noise
         if c==Flutec #Appends to the indiviual song vectors
             Noise=0.65*NoiseY(Noise, FLo, FHi) #Flute Noise
-        elseif c==Clarc
+        elseif c==Clarc 
             Noise=NoiseY(Noise, CLo, CHi) #Clarinet Noise
-        elseif c==[]
-            println("Invalid Instrument selected")
+        elseif c==Oboec
+            Noise=Noisey(Noise, OLo, OHi)
+        elseif c==Bassoonc
+            Noise=NoiseY(Noise, BLo, BHi) #Clarinet Noise
+
         end
 
         
@@ -239,8 +244,17 @@ end
 FLo=500
 FHi=10000
 
+#Clarinet Noise
 CLo=50
 CHi=600
+
+#oboe Noise
+OLo=100
+OHi=800
+
+#Bassoon Noise
+BLo=20
+BHi=800
 
 #delete function
 function delete_clicked(Insturment::Int64)

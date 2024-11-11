@@ -2,7 +2,7 @@ using FFTW
 using Plots
 using WAV
 
-file = "Sample_Audio/OboeA5.WAV" # adjust as needed
+file = "Sample_Audio/OboeA4.WAV" # adjust as needed
 (z, S) = wavread(file)
 #sound(z, S) # uncomment this to hear a heresy
 N = length(z)
