@@ -49,13 +49,21 @@ Csong = Float32[]
 Osong = Float32[]
 Bsong = Float32[]
 
-#declaring the Envelope relations
+#declaring the Envelope/Articulation relations
 NomETime = [0,0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1] #normal Envelope
 NomEValue = [0,0.6,  0.9, 0.8,0.7, 0.4, 0.2, 0]
 
 
 StacETime = [0,0.03, 0.08, 0.11,0.14, 0.22, 0.25, 0.28, 0.35] #Staccato Envelope
 StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
+
+MarcETime = [0,0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 1] #normal Envelope
+MarcEValue = [0,0.8,  1, 0.9,0.7, 0.5, 0.2, 0]
+
+
+TenETime = [0,0.1, 0.2, 0.5,0.6, 0.8, 0.85, 0.95, 1] #Staccato Envelope
+TenEValue = [0,0.6, 1, 0.9,0.8,0.6, 0.4, 0.15, 0]
+
 
 
 #the Overtone series ratios for the insturments that make up their timberal quality
@@ -182,16 +190,18 @@ function Audio(Note::Vector{note_datas} , c_Vect::Vector{Vector{Float64}}, BPM::
 
         Duration=N/S #duration of note
         #This is to generate the envelope and it will call values that are hard set within the code
-        if Note[i].Envindex ==2
+        if Note[i].Envindex ==2#normal envelope
             Envtime=NomETime*Duration
-            EnvVal=NomEValue #normal envelope
-        elseif Note[i].Envindex==1
+            EnvVal=NomEValue 
+        elseif Note[i].Envindex==1#staccato envelope
             Envtime=StacETime*Duration
-            EnvVal=StacEValue #staccato envelope
-        else 
-            println("You have inputted an invalid articulation")
-            env=zeros(size(t), 1) 
-            return nothing
+            EnvVal=StacEValue 
+        elseif Note[i].Envindex==4 #Marcato/Accent Envelope
+            Envtime=MarcETime*Duration
+            EnvVal=MarcEValue
+        elseif Note[i].Envindex==3#Tenuto envelope
+            Envtime=TenETime*Duration
+            EnvVal=TenEValue 
         end
 
         env=interp1(Envtime,EnvVal,t) #this uses the envelope values chosen above to generate the envelope
@@ -403,7 +413,7 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}, Playback::Bool)
     
     song = Float32[]
     song = (Mixer[1] .* FinFsong) .+ (Mixer[2] .* FinCsong) .+( Mixer[3] .*FinOsong ).+ (Mixer[4] .* FinBsong )#adding song vectors together
-    
+
     if Playback== true #Checks that we are actually playing the song and not just exporting
         sound(song, S) # play the entire song when user clicks "end"
     end
