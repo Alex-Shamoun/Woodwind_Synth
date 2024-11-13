@@ -149,8 +149,8 @@ main() do app::Application
     set_title_widget!(header_bar, Label("Woodwind Quartet Synthesizer"))
 
     #making keyboard
-    white=["F" 2 65; "G" 4 67; "A" 6 69; "B" 8 71; "C" 10 72; "D" 12 74; "E" 14 76; "Rest" 16 -70] #array contaning each note's name and its column position
-    black = ["F#" 2 66; "G#" 4 68; "A#" 6 70; "C#" 10 73; "D#" 12 75] #array containing each sharp's name and its column position
+    white=["(z)" 2 65; "(x)" 4 67; "(c)" 6 69; "(v)" 8 71; "(b)" 10 72; "(n)" 12 74; "(m)" 14 76; "Rest (,)" 16 -70] #array contaning each note's name and its column position
+    black = ["(s)" 2 66; "(d)" 4 68; "(f)" 6 70; "(h)" 10 73; "(j)" 12 75] #array containing each sharp's name and its column position
     Note_Durations = ["Whole" 2 4; "Half" 4 2; "Quarter" 6 1; "Eigth" 8 1/2; "Sixteenth" 10 1/4] #array containing each note duration and position
     Sliders = ["Tremolo Amplitude" 6 4 6; "Tremolo Frequency (Hz)" 6 6 6; "Vibrato Amplitude" 13 4 6; "Vibrato Frequency (Hz)" 13 6 6] #array containing each slider and their position (for vibrato and tremolo)
     Dynamics =["Forte" 6 1; "Mezzo Forte" 8 0.7; "Mezzo Piano" 10 0.5; "Piano" 12 0.3] #array containing the dynamics and posiition
@@ -264,7 +264,10 @@ main() do app::Application
     #Function call for the keyboard input to the keyboard
     function Key_Pressed(data)
         Octave= get_value(OctaveButton)
-
+        dot=1
+        if get_is_active(Dot_Button) == true
+            dot=1.5
+        end
         if get_selected(InstrumentChoice) == Bassoon_ID # Adjusts the octave for the Bassoon
             Octave-=2
         end
@@ -274,7 +277,7 @@ main() do app::Application
         Vib_Freq=get_value(Slider_vals["Vibrato Frequency (Hz)"])
         Trem_Amp=get_value(Slider_vals["Tremolo Amplitude"])
         Trem_Freq=get_value(Slider_vals["Tremolo Frequency (Hz)"])
-        Note_Info = note_datas(data +12*Octave , Articulation_Index, Dynamic_Index,Vib_Amp , Vib_Freq, Trem_Amp,Trem_Freq,Duration_Val)
+        Note_Info = note_datas(data +12*Octave , Articulation_Index, Dynamic_Index,Vib_Amp , Vib_Freq, Trem_Amp,Trem_Freq,Duration_Val*dot)
         #Makes sure that you have the right instrument selected
 
         instid= get_selected(InstrumentChoice)
@@ -439,6 +442,22 @@ main() do app::Application
         Mousetrap.insert_at!(grid, Note_vals[Name], col+4 , 1 ,2, 1) # put the button in the grid
 
     end
+
+    #Note Dot Button
+    Dot_Button = ToggleButton()
+    Named = Label("Dot")
+    set_child!(Dot_Button, Named)
+    add_css_class!(Dot_Button, "white")
+    connect_signal_toggled!(Dot_Button) do self::ToggleButton
+        if get_is_active(self) 
+            remove_css_class!(Dot_Button, "white")
+            add_css_class!(Dot_Button, "pressed")
+        else
+            remove_css_class!(Dot_Button, "pressed")
+            add_css_class!(Dot_Button, "white")
+        end
+    end
+    insert_at!(grid, Dot_Button, 16, 1, 1, 1)
 
     #adds buttosn for dynamics
     for i in 1:size(Dynamics, 1) # add the Note Value keys to the grid
@@ -606,6 +625,9 @@ main() do app::Application
         end 
         if code==KEY_m 
             Key_Pressed(76)
+        end
+        if code==KEY_comma 
+            Key_Pressed(-70)
         end
 
         # End of Keyboard to keyboard shortcuts

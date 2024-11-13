@@ -60,13 +60,15 @@ StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
 
 #Declaring Flute values
 
-Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes ratio for Flute (A4)
+Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
 
 #clarinet values
-Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*120 # amplitudes ratio for Clarinet (A4)
+Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
 
 #Oboe values
-Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*100 #amplitudes ratio for Oboe (A4)
+Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*85 #amplitudes ratio for Oboe (A4)
+Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *85
+OBOE = [Oboec, Oboec2]
 
 #Bassoon values
 Bassoonc = [0.19, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes] (A2)
@@ -138,7 +140,7 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         f=F*freq #applies frequency to harmonics
 
         #Vibrato
-        lfo = Note[i].VibFreq*0.0001 * cos.(2π* Note[i].Vibamp *t) / 4 #the ammount we vibrato by
+        lfo = Note[i].Vibamp*0.002 * cos.(2π* Note[i].VibFreq *t) / 4 #the ammount we vibrato by
 
         z = +([c[k] * sin.(2π * f[k] * t + f[k] * lfo) for k in 1:length(c)]...) #generates the wave and applies vibrato
         
@@ -148,7 +150,7 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         elseif c==Clarc 
             Noise=NoiseY(Noise, CLo, CHi) #Clarinet Noise
         elseif c==Oboec
-            Noise=Noisey(Noise, OLo, OHi)
+            Noise=NoiseY(Noise, OLo, OHi)
         elseif c==Bassoonc
             Noise=NoiseY(Noise, BLo, BHi) #Clarinet Noise
 
@@ -179,7 +181,7 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         Z = env .* x #applies the envelope
 
         #Generating Tremolo
-        Tremlfo = (1-Note[i].TremAmp*0.1).- Note[i].TremAmp*0.1 * cos.(2π*Note[i].TremFreq*t) # what frequency?
+        Tremlfo = (1-Note[i].TremAmp*0.045).- Note[i].TremAmp*0.06 * cos.(2π*Note[i].TremFreq*t) # what frequency?
         global Music = Tremlfo .* Z #applies Tremolo to note
 
         Music *= Note[i].Dynamic
@@ -187,6 +189,8 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         if Note[i].Midi == -70
             Music *=0
         end
+
+        Music=Music./200 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
         
         for i in 1:length(Music)
             Song_Vector[Indexval]=Music[i]
@@ -208,7 +212,7 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
            
         end
     elseif Playback== false
-        soundsc(Music, S)# play note so that user can hear it immediately
+        sound(Music, S)# play note so that user can hear it immediately
         if c==Flutec #Appends to the indiviual song vectors
             push!(Flute_Data, Note[1])
         elseif c==Clarc
@@ -247,26 +251,39 @@ BHi=800
 #delete function
 function delete_clicked(Insturment::Int64)
     if Insturment==1 #if the current instrument selection is a flute
-        if length(Fsong)==0 #checks if song is empty
+        if length(Flute_Data)==0 #checks if song is empty
             println("Song empty")
         else
             pop!(Flute_Data)
         end
     elseif Insturment==2 #if the current insturment selection is a clarinet 
         #same as the principles above
-        if length(Csong)==0 
+        if length(Clarinet_Data)==0 
             println("Song empty")
         else
             pop!(Clarinet_Data)
         end
-    else 
-        print("Please select an Insturment to delete a note")
+    elseif Insturment==3 #if the current insturment selection is a clarinet 
+        #same as the principles above
+        if length(Oboe_Data)==0 
+            println("Song empty")
+        else
+            pop!(Oboe_Data)
+        end 
+    
+    elseif Insturment==4 #if the current insturment selection is a clarinet 
+        #same as the principles above
+        if length(Bassoon_Data)==0 
+            println("Song empty")
+        else
+            pop!(Bassoon_Data)
+        end
     end
 end
 
 function clear_clicked(Insturment::Int64)
     if Insturment==1 #if the current instrument selection is a flute
-        if length(Fsong)==0 #checks if song is empty
+        if length(Flute_Data)==0 #checks if song is empty
             println("Song empty")
         else
             notes=length(Flute_Data)
@@ -276,7 +293,7 @@ function clear_clicked(Insturment::Int64)
         end
     elseif Insturment==2 #if the current insturment selection is a clarinet 
         #same as the principles above
-        if length(Csong)==0 
+        if length(Clarinet_Data)==0 
             println("Song empty")
         else
             notes=length(Clarinet_Data)
@@ -284,6 +301,27 @@ function clear_clicked(Insturment::Int64)
             pop!(Clarinet_Data)
             end
         end
+    elseif Insturment==3 #if the current insturment selection is a clarinet 
+        #same as the principles above
+        if length(Oboe_Data)==0 
+            println("Song empty")
+        else
+            notes=length(Oboe_Data)
+            for i in 1:notes
+            pop!(Oboe_Data)
+            end
+        end
+    elseif Insturment==4 #if the current insturment selection is a clarinet 
+        #same as the principles above
+        if length(Bassoon_Data)==0 
+            println("Song empty")
+        else
+            notes=length(Bassoon_Data)
+            for i in 1:notes
+            pop!(Bassoon_Data)
+            end
+        end
+    
     else 
         print("Please select an Insturment to delete a note")
     end
@@ -348,12 +386,12 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}, Playback::Bool)
     song = Float32[]
     song = (Mixer[1] .* FinFsong) .+ (Mixer[2] .* FinCsong) .+( Mixer[3] .*FinOsong ).+ (Mixer[4] .* FinBsong )#adding song vectors together
 
-    println(length(Fsong))
+    
+
     if Playback== true #Checks that we are actually playing the song and not just exporting
-        soundsc(song, S) # play the entire song when user clicks "end"
+        sound(song, S) # play the entire song when user clicks "end"
     end
-    Song=song./50 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
-    wavwrite(Song,"Exported_Audio/Song.WAV"; Fs=44100) # save song to file
+    wavwrite(song,"Exported_Audio/Song.WAV"; Fs=44100) # save song to file
 
 end
 
@@ -384,10 +422,9 @@ function Play_Part(BPM::Int64, instrument::Int64, Mix::Float32, Playback::Bool) 
 
     song = Mix .* songl # creates the audio vector
     if Playback== true #checks that we are not just exporting
-        soundsc(song, S) # play the entire song when user clicks "end"
+        sound(song, S) # play the entire song when user clicks "end"
     end
-    Song=song./50 #adjusts volume for output. This was done as it was outputting way too loud due to multipying by 100 earlier to make the values easier to work with.
-    wavwrite(Song,"Exported_Audio/$(inst)_Part.WAV"; Fs=44100) # save song to file
+    wavwrite(song,"Exported_Audio/$(inst)_Part.WAV"; Fs=44100) # save song to file
 
 end
 
