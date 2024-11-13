@@ -203,5 +203,41 @@ Onoise= 2*real(ifft(fz)) # convert back to time domain
 x = z * c.+ ONoise
 
 Oboe = env .* x 
-soundsc(Oboe, S)
+#soundsc(Oboe, S)
 #plot(Oboe)
+
+
+#Bassoon Testing
+
+
+S = 44100
+N = Int(1 * S) # 0.5 sec
+t = (0:N-1)/S # time samples: t = n/S
+c = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*100 # amplitudes #Bassoon ratio 1 (A2)
+#c = [0.016, 0.005, 0.003, 0.048, 0.0265, 0.015, 0.013]*100 # amplitudes #Bassoon ratio 2 (A3)
+
+
+f= [1, 2, 3, 4, 5, 6, 7] *(440*2)
+z = sin.(2π * t * f'*2^(0/12))
+
+
+
+BNoise=0.005*randn(size(t))*100
+#Clarinet Noise
+lo=100
+hi=800
+N = length(BNoise)
+cutoff_hz = [lo, hi] # frequency range to retain (pass)
+cutoff_index = round.(Int, cutoff_hz/S*N) # k = (f/S)*N
+fx = fft(ONoise) # spectrum
+fz = zeros(eltype(fx), size(fx))
+pass = (1+cutoff_index[1]):min(1+cutoff_index[2], N)
+fz[pass] .= fx[pass] # pass band
+Onoise= 2*real(ifft(fz)) # convert back to time domain
+
+
+
+x = z * c.+ BNoise
+
+Oboe = env .* x 
+soundsc(Oboe, S)

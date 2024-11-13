@@ -2,18 +2,18 @@ using FFTW
 using Plots
 using WAV
 
-file = "Sample_Audio/OboeA4.WAV" # adjust as needed
+file = "Sample_Audio/Bassoon_A3.WAV" # adjust as needed
 (z, S) = wavread(file)
 #sound(z, S) # uncomment this to hear a heresy
 N = length(z)
 Z = fft(z)
-plot(2/N * abs.(Z), xlims=(1,N/2+1), xlabel="frequency index l=k+1", ylabel="Z[l]", plot_title="A4 Clarinet Spectrum")
-xlims!(1,1.5*10^4)
+plot(2/N * abs.(Z), xlims=(1,N/2+1), xlabel="frequency index l=k+1", ylabel="Z[l]", plot_title="A3 Bassoon Spectrum")
+xlims!(1,4*10^3)
 
 
 
 
-savefig("Spectrum.png")
+savefig("Spectrum_Analysis/A3_Bassoon_Spectrum.png")
 
 
 # k=findall(2/N*abs.(Z) .>0.0001)
