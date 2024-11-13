@@ -180,7 +180,7 @@ c = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*100 # amplitudes #oboe ratio 1 (A4
 c = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006]*100 # amplitudes #oboe ratio 2 (A5)
 
 
-f= [1, 2, 3, 4, 5, 6, 7] *(440*2)
+f= [1, 2, 3, 4, 5, 6, 7] *(440)
 z = sin.(2π * t * f'*2^(0/12))
 
 
@@ -213,19 +213,19 @@ Oboe = env .* x
 S = 44100
 N = Int(1 * S) # 0.5 sec
 t = (0:N-1)/S # time samples: t = n/S
-c = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*100 # amplitudes #Bassoon ratio 1 (A2)
-#c = [0.016, 0.005, 0.003, 0.048, 0.0265, 0.015, 0.013]*100 # amplitudes #Bassoon ratio 2 (A3)
+#c = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*150 # amplitudes #Bassoon ratio 1 (A3)
+c = [0.016, 0.005, 0.004, 0.040, 0.027, 0.015, 0.013]*180 # amplitudes #Bassoon ratio 2 (A2)
 
 
-f= [1, 2, 3, 4, 5, 6, 7] *(440*2)
+f= [1, 2, 3, 4, 5, 6, 7] *(220)
 z = sin.(2π * t * f'*2^(0/12))
 
 
 
-BNoise=0.005*randn(size(t))*100
+BNoise=0.0004*randn(size(t))*100
 #Clarinet Noise
-lo=100
-hi=800
+lo=50
+hi=400
 N = length(BNoise)
 cutoff_hz = [lo, hi] # frequency range to retain (pass)
 cutoff_index = round.(Int, cutoff_hz/S*N) # k = (f/S)*N
@@ -239,5 +239,8 @@ Onoise= 2*real(ifft(fz)) # convert back to time domain
 
 x = z * c.+ BNoise
 
-Oboe = env .* x 
-soundsc(Oboe, S)
+
+
+Bassoon = env .* x 
+Bassoon = Bassoon ./150
+sound(Bassoon, S)
