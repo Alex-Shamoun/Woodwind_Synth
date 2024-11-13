@@ -49,30 +49,44 @@ Csong = Float32[]
 Osong = Float32[]
 Bsong = Float32[]
 
-#declaring the Envelope relations
+#declaring the Envelope/Articulation relations
 NomETime = [0,0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1] #normal Envelope
-NomEValue = [0,0.6,  0.9, 0.8,0.7, 0.4, 0.2, 0]
+NomEValue = [0,0.6,  0.85, 0.8,0.7, 0.4, 0.2, 0]
 
 
 StacETime = [0,0.03, 0.08, 0.11,0.14, 0.22, 0.25, 0.28, 0.35] #Staccato Envelope
 StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
 
+MarcETime = [0,0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 1] #normal Envelope
+MarcEValue = [0,0.8,  1.15, 1,0.7, 0.5, 0.2, 0]
+
+
+TenETime = [0,0.1, 0.2, 0.5,0.6, 0.8, 0.85, 0.95, 1] #Staccato Envelope
+TenEValue = [0,0.6, 1, 0.9,0.8,0.7, 0.6, 0.15, 0]
+
+
+
+#the Overtone series ratios for the insturments that make up their timberal quality
 
 #Declaring Flute values
 
 Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
-
+Flutec2 = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
+FLUTE= [Flutec, Flutec2]
 #clarinet values
 Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
+Clarc2 = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
+CLARINET= [Clarc, Clarc2]
 
 #Oboe values
-Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*85 #amplitudes ratio for Oboe (A4)
-Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *85
+Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*35 #amplitudes ratio for Oboe (A4)
+Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *35 # amplitudes ratio for Oboe (A5)
 OBOE = [Oboec, Oboec2]
 
 #Bassoon values
-Bassoonc = [0.19, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*80 # amplitudes] (A2)
-
+Bassoonc = [0.016, 0.005, 0.004, 0.040, 0.027, 0.015, 0.013]*500 # amplitudes #Bassoon ratio 1 (A2)
+Bassoonc2 = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*500 # amplitudes #Bassoon ratio 2 (A3)
+BASSOON = [Bassoonc, Bassoonc2] 
 
 octave = 4
 BPM=120
@@ -97,13 +111,13 @@ function Instrumental_Note_Call(Instrument::Int64, Note_Info::note_datas, BPM::I
     Vect=[Note_Info]
     #push!(Vect, Note_Info)
     if Instrument==1
-        x=Audio(Vect, Flutec, BPM, false)
+        x=Audio(Vect, FLUTE, BPM, false)
     elseif Instrument==2
-        x=Audio(Vect, Clarc, BPM, false)
+        x=Audio(Vect, CLARINET, BPM, false)
     elseif Instrument ==3
-        x=Audio(Vect, Oboec, BPM, false)
+        x=Audio(Vect, OBOE, BPM, false)
     elseif Instrument ==4
-        x=Audio(Vect, Bassoonc, BPM, false)
+        x=Audio(Vect, BASSOON, BPM, false)
     end
     #calls the audio function depending on what instrument we are playing
     return nothing
@@ -113,7 +127,7 @@ end
 
 
 
-function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playback::Bool)
+function Audio(Note::Vector{note_datas} , c_Vect::Vector{Vector{Float64}}, BPM::Int64, Playback::Bool)
     BPS=BPM/60
     Vectsize= 0
     for i in 1:length(Note)
@@ -134,10 +148,23 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
 
         Noise= 2.5*randn(size(t)) 
         freq =(440 * 2^((Note[i].Midi-69)/12)) # compute frequency from midi number - FIXED!
-        if Note[i].Midi==-70
-            freq=0 #removes frequency for rest note
-        end
         f=F*freq #applies frequency to harmonics
+
+        #Utilizing the right overtone series
+        if Note[i].Midi > 77
+            c=c_Vect[2]
+        else
+            c=c_Vect[1]
+        end
+        if c_Vect== BASSOON
+            if Note[i].Midi > 53
+                c=c_Vect[2]
+            else
+                c=c_Vect[1]
+            end
+        end
+
+
 
         #Vibrato
         lfo = Note[i].Vibamp*0.002 * cos.(2π* Note[i].VibFreq *t) / 4 #the ammount we vibrato by
@@ -145,15 +172,14 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         z = +([c[k] * sin.(2π * f[k] * t + f[k] * lfo) for k in 1:length(c)]...) #generates the wave and applies vibrato
         
         #Generating Noise
-        if c==Flutec #Appends to the indiviual song vectors
+        if c_Vect==FLUTE #Appends to the indiviual song vectors
             Noise=0.65*NoiseY(Noise, FLo, FHi) #Flute Noise
-        elseif c==Clarc 
+        elseif c_Vect==CLARINET
             Noise=NoiseY(Noise, CLo, CHi) #Clarinet Noise
-        elseif c==Oboec
+        elseif c_Vect==OBOE
             Noise=NoiseY(Noise, OLo, OHi)
-        elseif c==Bassoonc
-            Noise=NoiseY(Noise, BLo, BHi) #Clarinet Noise
-
+        elseif c_Vect== BASSOON
+            Noise=0.3NoiseY(Noise, BLo, BHi) #Clarinet Noise
         end
 
         
@@ -164,16 +190,18 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
 
         Duration=N/S #duration of note
         #This is to generate the envelope and it will call values that are hard set within the code
-        if Note[i].Envindex ==2
+        if Note[i].Envindex ==2#normal envelope
             Envtime=NomETime*Duration
-            EnvVal=NomEValue #normal envelope
-        elseif Note[i].Envindex==1
+            EnvVal=NomEValue 
+        elseif Note[i].Envindex==1#staccato envelope
             Envtime=StacETime*Duration
-            EnvVal=StacEValue #staccato envelope
-        else 
-            println("You have inputted an invalid articulation")
-            env=zeros(size(t), 1) 
-            return nothing
+            EnvVal=StacEValue 
+        elseif Note[i].Envindex==4 #Marcato/Accent Envelope
+            Envtime=MarcETime*Duration
+            EnvVal=MarcEValue
+        elseif Note[i].Envindex==3#Tenuto envelope
+            Envtime=TenETime*Duration
+            EnvVal=TenEValue 
         end
 
         env=interp1(Envtime,EnvVal,t) #this uses the envelope values chosen above to generate the envelope
@@ -199,27 +227,26 @@ function Audio(Note::Vector{note_datas} , c::Vector{Float64}, BPM::Int64, Playba
         #soundsc(Song_Vector, S)
     end
     if Playback== true
-        if c==Flutec #Appends to the indiviual song vectors
+        if c_Vect==FLUTE #Appends to the indiviual song vectors
             global Fsong= Song_Vector #Saves note to Flute
-        elseif c==Clarc
+        elseif c_Vect==CLARINET
             global Csong= Song_Vector#Saves note to Clarinet
            
-        elseif c==Oboec
+        elseif c_Vect==OBOE
             global Osong= Song_Vector #Saves note to Oboe
           
-        elseif c==Bassoonc
+        elseif c_Vect==BASSOON
             global Bsong= Song_Vector #Saves note to Bassoon
-           
         end
     elseif Playback== false
         sound(Music, S)# play note so that user can hear it immediately
-        if c==Flutec #Appends to the indiviual song vectors
+        if c_Vect==FLUTE #Appends to the indiviual song vectors
             push!(Flute_Data, Note[1])
-        elseif c==Clarc
+        elseif c_Vect==CLARINET
             push!(Clarinet_Data, Note[1])
-        elseif c==Oboec
+        elseif c_Vect==OBOE
             push!(Oboe_Data, Note[1])
-        elseif c==Bassoonc
+        elseif c_Vect==BASSOON
             push!(Bassoon_Data, Note[1])
         end
     end
@@ -246,7 +273,7 @@ OHi=800
 
 #Bassoon Noise
 BLo=20
-BHi=800
+BHi=350
 
 #delete function
 function delete_clicked(Insturment::Int64)
@@ -336,21 +363,22 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}, Playback::Bool)
     global Bsong
 
     #Running the funcitons to generate the indiviual instrument vectors
-    Audio(Flute_Data, Flutec, BPM, true) 
-    Audio(Clarinet_Data, Clarc, BPM, true)
-    Audio(Oboe_Data, Oboec, BPM, true)
-    Audio(Bassoon_Data, Bassoonc, BPM, true)
+    Audio(Flute_Data, FLUTE, BPM, true) 
+    Audio(Clarinet_Data, CLARINET, BPM, true)
+    Audio(Oboe_Data, OBOE, BPM, true)
+    Audio(Bassoon_Data, BASSOON, BPM, true)
     global FinFsong= Fsong #ddeclaring final song vectors
     global FinCsong= Csong
     global FinOsong= Osong #ddeclaring final song vectors
     global FinBsong= Bsong
 
-    
+        
 
     Fsize=length(FinFsong) #getting length of Song vectors
     Csize=length(FinCsong)
     Osize= length(FinOsong)
     Bsize = length(FinBsong)
+
 
     length_song =[Fsize, Csize, Osize, Bsize ]
     long= 1
@@ -386,8 +414,6 @@ function Play_button_clicked(BPM::Int64, Mixer::Vector{Float32}, Playback::Bool)
     song = Float32[]
     song = (Mixer[1] .* FinFsong) .+ (Mixer[2] .* FinCsong) .+( Mixer[3] .*FinOsong ).+ (Mixer[4] .* FinBsong )#adding song vectors together
 
-    
-
     if Playback== true #Checks that we are actually playing the song and not just exporting
         sound(song, S) # play the entire song when user clicks "end"
     end
@@ -402,19 +428,19 @@ function Play_Part(BPM::Int64, instrument::Int64, Mix::Float32, Playback::Bool) 
     inst = ""
     #Running the funcitons to generate the indiviual instrument vectors
     if instrument== 1
-        Audio(Flute_Data, Flutec, BPM, true)
+        Audio(Flute_Data, FLUTE, BPM, true)
         songl=Fsong
         inst= "Flute"
     elseif instrument == 2
-        Audio(Clarinet_Data, Clarc, BPM, true)
+        Audio(Clarinet_Data, CLARINET, BPM, true)
         songl=Csong
         inst= "Clarinet"
     elseif instrument == 3
-        Audio(Oboe_Data, Oboec, BPM, true)
+        Audio(Oboe_Data, OBOE, BPM, true)
         songl=Osong
         inst= "Oboe"
     elseif instrument == 4
-        Audio(Bassoon_Data, Bassoonc, BPM, true)
+        Audio(Bassoon_Data, BASSOON, BPM, true)
         songl=Bsong
         inst= "Bassoon"
     end
