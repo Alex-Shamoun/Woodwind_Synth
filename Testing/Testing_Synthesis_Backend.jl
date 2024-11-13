@@ -51,18 +51,18 @@ Bsong = Float32[]
 
 #declaring the Envelope/Articulation relations
 NomETime = [0,0.1, 0.2, 0.5, 0.6, 0.7, 0.9, 1] #normal Envelope
-NomEValue = [0,0.6,  0.9, 0.8,0.7, 0.4, 0.2, 0]
+NomEValue = [0,0.6,  0.85, 0.8,0.7, 0.4, 0.2, 0]
 
 
 StacETime = [0,0.03, 0.08, 0.11,0.14, 0.22, 0.25, 0.28, 0.35] #Staccato Envelope
 StacEValue = [0,0.6, 1, 0.8,0.6,0.4, 0.2, 0.1, 0]
 
 MarcETime = [0,0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 1] #normal Envelope
-MarcEValue = [0,0.8,  1, 0.9,0.7, 0.5, 0.2, 0]
+MarcEValue = [0,0.8,  1.15, 1,0.7, 0.5, 0.2, 0]
 
 
 TenETime = [0,0.1, 0.2, 0.5,0.6, 0.8, 0.85, 0.95, 1] #Staccato Envelope
-TenEValue = [0,0.6, 1, 0.9,0.8,0.6, 0.4, 0.15, 0]
+TenEValue = [0,0.6, 1, 0.9,0.8,0.7, 0.6, 0.15, 0]
 
 
 
@@ -74,18 +74,18 @@ Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio
 Flutec2 = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
 FLUTE= [Flutec, Flutec2]
 #clarinet values
-Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*92 # amplitudes ratio for Clarinet (A4)
-Clarc2 = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*92 # amplitudes ratio for Clarinet (A4)
+Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
+Clarc2 = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
 CLARINET= [Clarc, Clarc2]
 
 #Oboe values
-Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*85 #amplitudes ratio for Oboe (A4)
-Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *85 # amplitudes ratio for Oboe (A5)
+Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*35 #amplitudes ratio for Oboe (A4)
+Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *35 # amplitudes ratio for Oboe (A5)
 OBOE = [Oboec, Oboec2]
 
 #Bassoon values
-Bassoonc = [0.016, 0.005, 0.004, 0.040, 0.027, 0.015, 0.013]*195 # amplitudes #Bassoon ratio 1 (A2)
-Bassoonc2 = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*160 # amplitudes #Bassoon ratio 2 (A3)
+Bassoonc = [0.016, 0.005, 0.004, 0.040, 0.027, 0.015, 0.013]*500 # amplitudes #Bassoon ratio 1 (A2)
+Bassoonc2 = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*500 # amplitudes #Bassoon ratio 2 (A3)
 BASSOON = [Bassoonc, Bassoonc2] 
 
 octave = 4
