@@ -151,7 +151,7 @@ main() do app::Application
     #making keyboard
     white=["(z)" 2 65; "(x)" 4 67; "(c)" 6 69; "(v)" 8 71; "(b)" 10 72; "(n)" 12 74; "(m)" 14 76; "Rest (,)" 16 -70] #array contaning each note's name and its column position
     black = ["(s)" 2 66; "(d)" 4 68; "(f)" 6 70; "(h)" 10 73; "(j)" 12 75] #array containing each sharp's name and its column position
-    Note_Durations = ["Whole" 2 4; "Half" 4 2; "Quarter" 6 1; "Eigth" 8 1/2; "Sixteenth" 10 1/4] #array containing each note duration and position
+    Note_Durations = ["Whole" 2 4; "Half" 4 2; "Quarter" 6 1; "Eighth" 8 1/2; "Sixteenth" 10 1/4] #array containing each note duration and position
     Sliders = ["Tremolo Amplitude" 6 4 6; "Tremolo Frequency (Hz)" 6 6 6; "Vibrato Amplitude" 13 4 6; "Vibrato Frequency (Hz)" 13 6 6] #array containing each slider and their position (for vibrato and tremolo)
     Dynamics =["Forte" 6 1; "Mezzo Forte" 8 0.7; "Mezzo Piano" 10 0.5; "Piano" 12 0.3] #array containing the dynamics and posiition
     Articulations= ["Staccato" 17 1 1; "Normal" 19 1 2; "Tenuto" 17 2 3; "Marcato" 19 2 4 ]
@@ -231,6 +231,8 @@ main() do app::Application
 
         if get_selected(InstrumentChoice) == Bassoon_ID # Adjusts the octave for the Bassoon
             Octave-=2
+        elseif get_selected(InstrumentChoice) == Flute_ID # Adjusts the octave to better fit the Flute range
+            Octave+=1
         end
 
         #Sets up the Struct with all the information
@@ -270,6 +272,8 @@ main() do app::Application
         end
         if get_selected(InstrumentChoice) == Bassoon_ID # Adjusts the octave for the Bassoon
             Octave-=2
+        elseif get_selected(InstrumentChoice) == Flute_ID # Adjusts the octave for the Bassoon
+            Octave+=1
         end
 
         #Sets up the Struct with all the information

@@ -71,21 +71,21 @@ TenEValue = [0,0.6, 1, 0.9,0.8,0.7, 0.6, 0.15, 0]
 #Declaring Flute values
 
 Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
-Flutec2 = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
+Flutec2 =[ 0.25, 0.065, 0.04, 0.005, 0.02, 0.004, 0.0002] *120 # amplitudes ratio for Flute (A5)
 FLUTE= [Flutec, Flutec2]
 #clarinet values
-Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
-Clarc2 = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
+Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*75 # amplitudes ratio for Clarinet (A4)
+Clarc2 = c= [0.084, 0.033, 0.005, 0.004, 0.003, 0.002, 0.0005]*455 # amplitude ratios for Clarinet (A5)
 CLARINET= [Clarc, Clarc2]
 
 #Oboe values
-Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*35 #amplitudes ratio for Oboe (A4)
-Oboec2 = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006] *35 # amplitudes ratio for Oboe (A5)
+Oboec = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*30 #amplitudes ratio for Oboe (A4)
+Oboec2 = [0.4, 0.88, 0.08, 0.075, 0.02, 0.01, 0.006] *40 # amplitudes ratio for Oboe (A5)
 OBOE = [Oboec, Oboec2]
 
 #Bassoon values
 Bassoonc = [0.016, 0.005, 0.004, 0.040, 0.027, 0.015, 0.013]*500 # amplitudes #Bassoon ratio 1 (A2)
-Bassoonc2 = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.045]*500 # amplitudes #Bassoon ratio 2 (A3)
+Bassoonc2 = [0.019,0.13, 0.055, 0.01, 0.006, 0.005, 0.0045]*500 # amplitudes #Bassoon ratio 2 (A3)
 BASSOON = [Bassoonc, Bassoonc2] 
 
 octave = 4
@@ -175,7 +175,7 @@ function Audio(Note::Vector{note_datas} , c_Vect::Vector{Vector{Float64}}, BPM::
         if c_Vect==FLUTE #Appends to the indiviual song vectors
             Noise=0.65*NoiseY(Noise, FLo, FHi) #Flute Noise
         elseif c_Vect==CLARINET
-            Noise=NoiseY(Noise, CLo, CHi) #Clarinet Noise
+            Noise=0.6*NoiseY(Noise, CLo, CHi) #Clarinet Noise
         elseif c_Vect==OBOE
             Noise=NoiseY(Noise, OLo, OHi)
         elseif c_Vect== BASSOON

@@ -30,6 +30,8 @@ t = (0:N-1)/S # time samples: t = n/S
 
 
 c = [0.21, 0.14, 0.07, 0.045, 0.02]*100 # amplitudes
+
+
 f= [1, 2, 3, 4, 5] *440*2^(0/12)
 
 z = cos.(2π * t * f'*2^(0/12))
@@ -97,13 +99,15 @@ S = 44100
 N = Int(1 * S) # 0.5 sec
 t = (0:N-1)/S # time samples: t = n/S
 c = [0.9,0.05, 0.4, 0.04, 0.07, 0.03, 0.04]*100 # amplitudes
+c= [0.084, 0.033, 0.005, 0.004, 0.003, 0.002, 0.0005]*130 # amplitude ratios for Clarinet (A5)
+
 # f = [526.205, 1051.5, 1579.7, 2103.2, 2633.1] # frequencies
-f= [1, 2, 3, 4, 5, 6, 7] *440
+f= [1, 2, 3, 4, 5, 6, 7] *440 *2
 z = sin.(2π * t * f'*2^(0/12))
 
 
 
-CNoise=0.005*randn(size(t))*100
+CNoise=0.005*randn(size(t))*50
 #Clarinet Noise
 lo=50
 hi=600
@@ -121,7 +125,7 @@ Cnoise= 2*real(ifft(fz)) # convert back to time domain
 x = z * c.+ CNoise
 
 Clar = env .* x 
-#soundsc(Clar, S)
+soundsc(Clar, S)
 #plot(Clar)
 #xlims!(0,500)
 
@@ -178,6 +182,9 @@ N = Int(1 * S) # 0.5 sec
 t = (0:N-1)/S # time samples: t = n/S
 c = [0.38,0.41, 0.85, 0.62, 0.08, 0.06, 0.07]*100 # amplitudes #oboe ratio 1 (A4)
 c = [0.4, 0.88, 0.8, 0.075, 0.02, 0.01, 0.006]*100 # amplitudes #oboe ratio 2 (A5)
+
+c= [ 0.25, 0.065, 0.04, 0.005, 0.02, 0.004, 0.0002] *50  # Amplitudes for the Flute ratio (A5) 
+  
 
 
 f= [1, 2, 3, 4, 5, 6, 7] *(440)
@@ -243,4 +250,4 @@ x = z * c.+ BNoise
 
 Bassoon = env .* x 
 Bassoon = Bassoon ./150
-sound(Bassoon, S)
+#sound(Bassoon, S)

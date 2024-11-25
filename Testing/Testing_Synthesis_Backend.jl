@@ -71,11 +71,11 @@ TenEValue = [0,0.6, 1, 0.9,0.8,0.7, 0.6, 0.15, 0]
 #Declaring Flute values
 
 Flutec = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
-Flutec2 = [0.21, 0.14, 0.07, 0.045, 0.02, 0.02/5, 0.02/10]*115 # amplitudes ratio for Flute (A4)
+Flutec2 =[ 0.25, 0.065, 0.04, 0.005, 0.02, 0.004, 0.0002] *120 # amplitudes ratio for Flute (A5)
 FLUTE= [Flutec, Flutec2]
 #clarinet values
 Clarc = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
-Clarc2 = [0.8,0.02, 0.13, 0.03, 0.02, 0.01, 0.01]*85 # amplitudes ratio for Clarinet (A4)
+Clarc2 = c= [0.084, 0.033, 0.005, 0.004, 0.003, 0.002, 0.0005]*60 # amplitude ratios for Clarinet (A5)
 CLARINET= [Clarc, Clarc2]
 
 #Oboe values
